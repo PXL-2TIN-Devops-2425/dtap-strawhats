@@ -8,6 +8,7 @@ pipeline {
         stage ('cleanup'){
             steps{
                 cleanWs()
+                sh 'docker remove -f calc-app-container'
             }
         }
         stage('fetch app code') {
@@ -43,12 +44,13 @@ pipeline {
         }
         stage('deployment'){
             steps{
-                sh 'docker run -d -p 3000:3000 ${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:latest'
+                sh 'docker run -d -p 3000:3000 -t calc-app-container ${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:latest'
             }
         }
     }
     post {
         always {
+            sh 'docker logout'
             cleanWs()
         }
     }
