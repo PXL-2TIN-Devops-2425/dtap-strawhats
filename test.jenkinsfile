@@ -10,7 +10,7 @@ pipeline {
         stage('fetch app code') {
             steps {
                 // Get some code from a GitHub repository
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+                git branch: 'main', url: 'https://github.com/SarbjitSinghPXL/calculator-app-finished.git'
             }
         }
         stage('Install dependencies'){
@@ -23,13 +23,6 @@ pipeline {
         }
         stage('Build artifact'){
             steps{
-                sh 'rm Dockerfile'
-                sh 'echo "FROM node:14" >> Dockerfile'
-                sh 'echo "WORKDIR /usr/src/app" >> Dockerfile'
-                sh 'echo "COPY . ." >> Dockerfile'
-                sh 'echo "RUN npm install" >> Dockerfile'
-                sh 'echo "EXPOSE 3000" >> Dockerfile'
-                sh 'echo "CMD [\"npm\", \"start\"]" >> Dockerfile'
                 sh 'cat Dockerfile'
                 sh 'docker build . -t calc-app-image'
             }
