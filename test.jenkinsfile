@@ -44,7 +44,7 @@ pipeline {
         }
         stage('deployment'){
             steps{
-                sh 'docker run -d -p 3000:3000 -t calc-app-container ${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:latest'
+                sh 'docker run -d -p 3000:3000 --name=calc-app-container ${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:latest'
             }
         }
     }
