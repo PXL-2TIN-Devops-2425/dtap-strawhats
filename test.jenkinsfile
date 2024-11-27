@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage ('cleanup'){
             steps{
-                // TODO
+                cleanWs()
             }
         }
         stage('fetch app code') {
@@ -12,6 +12,33 @@ pipeline {
                 // Get some code from a GitHub repository
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
+        }
+        stage('Install dependencies'){
+            tools {
+                nodejs 'testenvnode'
+            }
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Build artifact'){
+                sh 'cat <<EOT >> Dockerfile
+                    FROM node:14
+                    WORKDIR /usr/src/app
+
+                    COPY . .
+                    RUN npm install
+
+                    EXPOSE 3000
+
+                    CMD ["npm","start"]
+                    EOT'
+                sh 'ls -la'
+        } 
+    }
+    post {
+        always {
+            cleanWs()
         }
     }
 }
