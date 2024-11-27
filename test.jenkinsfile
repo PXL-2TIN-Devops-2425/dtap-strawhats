@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    enviroment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') 
+    }
   
     stages {
         stage ('cleanup'){
@@ -23,10 +26,21 @@ pipeline {
         }
         stage('Build artifact'){
             steps{
-                sh 'cat Dockerfile'
-                sh 'docker build . -t calc-app-image'
+                script {
+                    docker.build("${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:${env.BUILD_NUMBER}")
+                }
             }
         } 
+        stage('Push artifact'){
+            steps{
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        docker.image("${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:${env.BUILD_NUMBER}").push()
+                        docker.image("${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:${env.BUILD_NUMBER}").push('latest')
+                    }
+                }
+            }
+        }
     }
     post {
         always {
