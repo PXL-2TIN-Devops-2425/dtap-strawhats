@@ -23,6 +23,7 @@ pipeline {
         }
         stage('Build artifact'){
             steps{
+                sh 'rm Dockerfile'
                 sh 'echo "FROM node:14" >> Dockerfile'
                 sh 'echo "WORKDIR /usr/src/app" >> Dockerfile'
                 sh 'echo "COPY . ." >> Dockerfile'
