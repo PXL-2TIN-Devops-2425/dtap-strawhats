@@ -42,7 +42,7 @@ pipeline {
             }
         }
         stage('deployment'){
-            stages{
+            steps{
                 sh 'docker run -d -p 3000:3000 ${DOCKERHUB_CREDENTIALS_USR}/calc-app-image:latest'
             }
         }
