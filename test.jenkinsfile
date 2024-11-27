@@ -29,7 +29,7 @@ pipeline {
                 sh 'echo "COPY . ." >> Dockerfile'
                 sh 'echo "RUN npm install" >> Dockerfile'
                 sh 'echo "EXPOSE 3000" >> Dockerfile'
-                sh 'echo "CMD ["npm", "start"]" >> Dockerfile'
+                sh 'echo "CMD [\"npm\", \"start\"]" >> Dockerfile'
                 sh 'cat Dockerfile'
                 sh 'docker build . -t calc-app-image'
             }
