@@ -22,6 +22,7 @@ pipeline {
             }
         }
         stage('Build artifact'){
+            steps{
                 sh 'echo "FROM node:14" >> Dockerfile'
                 sh 'echo "WORKDIR /usr/src/app" >> Dockerfile'
                 sh 'echo "COPY . ." >> Dockerfile'
@@ -29,6 +30,7 @@ pipeline {
                 sh 'echo "EXPOSE 3000" >> Dockerfile'
                 sh 'echo "CMD [\"npm\", \"start\"]" >> Dockerfile'
                 sh 'ls -la'
+            }
         } 
     }
     post {
