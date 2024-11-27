@@ -22,17 +22,12 @@ pipeline {
             }
         }
         stage('Build artifact'){
-                sh 'cat <<EOT >> Dockerfile
-                    FROM node:14
-                    WORKDIR /usr/src/app
-
-                    COPY . .
-                    RUN npm install
-
-                    EXPOSE 3000
-
-                    CMD ["npm","start"]
-                    EOT'
+                sh 'echo "FROM node:14" >> Dockerfile'
+                sh 'echo "WORKDIR /usr/src/app" >> Dockerfile'
+                sh 'echo "COPY . ." >> Dockerfile'
+                sh 'echo "RUN npm install" >> Dockerfile'
+                sh 'echo "EXPOSE 3000" >> Dockerfile'
+                sh 'echo "CMD [\"npm\", \"start\"]" >> Dockerfile'
                 sh 'ls -la'
         } 
     }
