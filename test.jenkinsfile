@@ -30,7 +30,7 @@ pipeline {
                 sh 'echo "EXPOSE 3000" >> Dockerfile'
                 sh 'echo "CMD [\"npm\", \"start\"]" >> Dockerfile'
                 sh 'ls -la'
-                sh 'echo Dockerfile'
+                sh 'cat Dockerfile'
             }
         } 
     }
