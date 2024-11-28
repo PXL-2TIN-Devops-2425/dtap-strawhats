@@ -29,7 +29,7 @@ pipeline {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
-                        docker run -d -p 80:3000 --name=calc-app-container safri1/calc-app-image 
+                        docker run -d -p 80:3000 --name=safri1/calc-app-container safri1/calc-app-image 
                         exit
                     '''
                 }
