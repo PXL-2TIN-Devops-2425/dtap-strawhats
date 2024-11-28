@@ -8,9 +8,15 @@ pipeline {
     stages {
         stage('cleanup') {
             steps {
-                sh 'docker stop $(docker ps -a -q)'
-                sh 'docker rm $(docker ps -a -q)'
-                sh 'docker rmi -f $(docker images -aq)'
+                sshagent(credentials: ['ssh-prod']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
+                        docker stop $(docker ps -q) || true
+                        docker rm $(docker ps -aq) || true
+                        docker rmi -f $(docker images -q) || true
+                        '
+                    '''
+                }
                 cleanWs()
             }
         }
@@ -20,7 +26,6 @@ pipeline {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
                         docker pull safri1/calc-app-image
-                        exit
                     '''
                 }
             }
@@ -30,8 +35,7 @@ pipeline {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
-                        docker container run -d -p 80:3000 --name=PXLcalc-app-container safri1/calc-app-image 
-                        exit
+                        docker container run -d -p 80:3000 --name=PXLcalc-app-container safri1/calc-app-image
                     '''
                 }
             }
