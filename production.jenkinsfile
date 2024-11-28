@@ -1,9 +1,47 @@
 pipeline {
     agent any
+    
+    environment {
+        PROD_SERVER_IP = '18.212.41.97'
+    }
+    
     stages {
-        stage('dtap production') {
+        stage('deploy prod') {
             steps {
-                echo "good luck..."
+                sshagent(credentials: ['ssh-prod']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP <<EOF
+                        docker pull safri1/calc-app-image
+                        EOF
+                    '''
+                }
+            }
+        }
+        stage('start prod') {
+            steps {
+                sshagent(credentials: ['ssh-prod']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP <<EOF
+                        docker run -d -p 80:3000 safri1/calc-app-image 
+                        EOF
+                    '''
+                }
+            }
+        }
+        stage('test prod') {
+            steps {
+                script {
+                    def response = sh(
+                        script: "curl -s -o /dev/null -w '%{http_code}' http://$PROD_SERVER_IP",
+                        returnStdout: true
+                    ).trim()
+                    
+                    if (response == '200') {
+                        echo "Server responded with 200 OK"
+                    } else {
+                        error "Server test failed. HTTP status code: ${response}"
+                    }
+                }
             }
         }
     }
