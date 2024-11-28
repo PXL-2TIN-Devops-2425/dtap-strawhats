@@ -10,9 +10,9 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP <<EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
                         docker pull safri1/calc-app-image
-                        EOF
+                        exit
                     '''
                 }
             }
@@ -21,9 +21,9 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP <<EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
                         docker run -d -p 80:3000 safri1/calc-app-image 
-                        EOF
+                        exit
                     '''
                 }
             }
