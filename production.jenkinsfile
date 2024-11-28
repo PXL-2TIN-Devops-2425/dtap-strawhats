@@ -10,6 +10,9 @@ pipeline {
             steps {
                 sh 'docker rm -f PXLcalc-app-container'
                 sh 'docker image remove safri1/calc-app-image'
+                sh 'docker ps -a'
+                sh 'docker image ls -a'
+                sh 'docker container ls -a'
                 cleanWs()
             }
         }
