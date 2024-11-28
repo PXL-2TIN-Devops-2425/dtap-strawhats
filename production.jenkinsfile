@@ -6,6 +6,13 @@ pipeline {
     }
     
     stages {
+        stage('cleanup') {
+            steps {
+                sh 'docker stop calc-app-container'
+                sh 'docker image remove safri1/calc-app-image'
+                cleanWs()
+            }
+        }
         stage('deploy prod') {
             steps {
                 sshagent(credentials: ['ssh-prod']) {
@@ -22,7 +29,7 @@ pipeline {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
-                        docker run -d -p 80:3000 safri1/calc-app-image 
+                        docker run -d -p 80:3000 --name=calc-app-container safri1/calc-app-image 
                         exit
                     '''
                 }
