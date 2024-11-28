@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('cleanup') {
             steps {
-                sh 'docker stop PXLcalc-app-container'
+                sh 'docker rm -f PXLcalc-app-container'
                 sh 'docker image remove safri1/calc-app-image'
                 cleanWs()
             }
