@@ -50,11 +50,30 @@ pipeline {
         stage('test prod') {
             steps {
                 script {
-                    def response = sh(
-                        script: "curl -s -o /dev/null -w '%{http_code}' http://$PROD_SERVER_IP",
-                        returnStdout: true
-                    ).trim()
-                    echo "HTTP status code: ${response}"
+                    sleep(10) // wachten totdat we zeker zijn dat het is gedeployed.
+                    
+                    retry(3) { // retry mechanism
+                        def response = sh(
+                            script: "curl -f -s -o /dev/null -w '%{http_code}' http://$PROD_SERVER_IP",
+                            returnStatus: true
+                        )
+                        
+                        if (response != 0) {
+                            error "Curl failed with exit code ${response}"
+                        }
+                        
+                        // Additional check to ensure 200 OK
+                        def httpCode = sh(
+                            script: "curl -s -o /dev/null -w '%{http_code}' http://$PROD_SERVER_IP",
+                            returnStdout: true
+                        ).trim()
+                        
+                        echo "HTTP status code: ${httpCode}"
+                        
+                        if (httpCode != '200') {
+                            error "HTTP status code is not 200. Got ${httpCode}"
+                        }
+                    }
                 }
             }
         }
