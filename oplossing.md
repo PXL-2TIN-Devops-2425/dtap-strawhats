@@ -32,16 +32,17 @@ usermod is de commando om permissions toe te wijzen aan een gebruiker (ubuntu) o
 ```groovy
 environment {
   PROD_SERVER_IP = '44.211.177.150'
+  PROD_SERVER_USER = 'ubuntu'
 }
 ```
-Hier stellen wij de IP in van de remote server waarop we de deployment willen maken. Een environment variabel is noodzakelijk om manuele verandering te voorkomen op meerdere lijnen.
+Hier stellen wij de IP en User in van de remote server waarop we de deployment willen maken. Een environment variabel is noodzakelijk om manuele verandering te voorkomen op meerdere lijnen.
 ### Cleanup
 ```groovy
 stage('cleanup') {
   steps {
       sshagent(credentials: ['ssh-prod']) {
           sh '''
-              ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
+              ssh -o StrictHostKeyChecking=no $PROD_SERVER_USER@$PROD_SERVER_IP '
               if [ "$(docker ps -a -q)" ]; then
                   docker stop $(docker ps -a -q)
                   docker rm $(docker ps -a -q)
@@ -59,9 +60,9 @@ stage('cleanup') {
 ```
 `sshagent(credentials: ['ssh-prod'])` 
 Hier zeggen we welke ssh key we gebruiken voor de ssh agent.
-`ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP`
+`ssh -o StrictHostKeyChecking=no $PROD_SERVER_USER@$PROD_SERVER_IP`
 Dit gaan we vaker terug zien. De `-o StrictHostKeyChecking=no` zorgt er voor dat we niet elke keer "yes" moeten typen wanneer de host niet gerecognised wordt.
-`ubuntu@$PROD_SERVER_IP` is voorzelf sprekend, dit is de user@ip van de remote server.
+`$PROD_SERVER_USER@$PROD_SERVER_IP` is voorzelf sprekend, dit is de user@ip van de remote server.
 ```groovy
 if [ "$(docker ps -a -q)" ]; then
     docker stop $(docker ps -a -q)
@@ -84,7 +85,7 @@ stage('deploy prod') {
     steps {
         sshagent(credentials: ['ssh-prod']) {
             sh '''
-                ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
+                ssh -o StrictHostKeyChecking=no $PROD_SERVER_USER@$PROD_SERVER_IP '
                 docker pull safri1/calc-app-image
                 '
             '''
@@ -104,7 +105,7 @@ stage('start prod') {
     steps {
         sshagent(credentials: ['ssh-prod']) {
             sh '''
-                ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
+                ssh -o StrictHostKeyChecking=no $PROD_SERVER_USER@$PROD_SERVER_IP '
                 docker container run -d -p 80:3000 --name=PXLcalc-app-container safri1/calc-app-image
                 '
             '''
