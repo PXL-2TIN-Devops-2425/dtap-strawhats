@@ -11,12 +11,10 @@ pipeline {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
-                        echo "Running as user: $(whoami)"
-                        echo "Groups: $(groups)"
-                        '
                         docker stop $(docker ps -a -q)
                         docker rm $(docker ps -a -q)
                         docker rmi -f $(docker images -aq)
+                        '
                     '''
                 }
                 cleanWs()
@@ -26,8 +24,9 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
                         docker pull safri1/calc-app-image
+                        '
                     '''
                 }
             }
@@ -36,8 +35,9 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP
-                        nohup docker container run -d -p 80:3000 --name=PXLcalc-app-container safri1/calc-app-image
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
+                        docker container run -d -p 80:3000 --name=PXLcalc-app-container safri1/calc-app-image
+                        '
                     '''
                 }
             }
