@@ -10,7 +10,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-prod']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP <<EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@$PROD_SERVER_IP '
                         if [ "$(docker ps -a -q)" ]; then
                             docker stop $(docker ps -a -q)
                             docker rm $(docker ps -a -q)
@@ -19,7 +19,7 @@ pipeline {
                         if [ "$(docker images -aq)" ]; then
                             docker rmi -f $(docker images -aq)
                         fi
-                        EOF
+                        '
                     '''
                 }
                 cleanWs()
