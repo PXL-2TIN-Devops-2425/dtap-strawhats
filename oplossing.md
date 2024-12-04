@@ -24,14 +24,6 @@ usermod is de commando om permissions toe te wijzen aan een gebruiker (ubuntu) o
 `-aG` zijn de permissies die we meegeven hiervoor.
 
 ## Pipeline
-### Environment variables
-```groovy
-environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') 
-    }
-```
-Hier worden uw dockerhub-credentials opgeslagen in de variable 'DOCKERHUB_CREDENTIALS'.
-
 ### Stages
 #### CleanUp
 ```groovy
