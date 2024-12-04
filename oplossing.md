@@ -2,6 +2,22 @@ Vul onderstaande aan met de antwoorden op de vragen uit de readme.md file. Wil j
 opmaak met Markdown.
 
 # A
+## Configuration
+
+### Jenkins Plugins
+
+![Plugins Docker](image.png)
+
+### Jenkins Tools
+
+![Tools NodeJS installaties](image-1.png)
+
+### Credentials
+
+![Docker Credentials](image-2.png)
+
+## Stages
+
 
 # B
 ## Configuratie
