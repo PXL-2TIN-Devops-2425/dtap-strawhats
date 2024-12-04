@@ -96,7 +96,7 @@ stage('Push artifact'){
     }
 }
 ```
-
+In deze stage wordt de docker image 'calc-app-image' gepusht naar de dockerhub van de user safri1 met als tag 'latest'. Hier worden de dockerhub credentials gebruikt voor het inloggen in dockerhub. Om deze stap te kunnen uitvoeren moet safri1 iedereen van het team toevoegen als collaboratuers om zo de push te kunnen doen.
 
 #### Deployment
 ```groovy
@@ -106,6 +106,7 @@ stage('deployment'){
     }
 }
 ```
+In deze stage wordt er een docker container aangemaakt en runnen we deze op de poort 3000. Deze docker container geven we de naam 'calc-app-container'.
 
 ### CleanUp
 ```groovy
@@ -116,7 +117,7 @@ post {
     }
 }
 ```
-
+In deze stap doen we een post always, zodat er altijd wordt uitgelogd op docker en de workspace wordt schoongemaakt, ookal geeft de vorige pipeline code een fout.
 
 # B
 ## Configuratie
