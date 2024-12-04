@@ -16,7 +16,24 @@ opmaak met Markdown.
 
 ![Docker Credentials](image-2.png)
 
+### Permissions
+We moeten er zeker van zijn dat we docker kunnen gebruiken via de pipeline zonder sudo.
+Dit doen we door de volgende commando in te voeren in de remote server waardat we de docker commando willen gebruiken:
+`sudo usermod -aG docker ubuntu`
+usermod is de commando om permissions toe te wijzen aan een gebruiker (ubuntu) op de gegeven commando (docker)
+`-aG` zijn de permissies die we meegeven hiervoor.
+
 ## Stages
+### Environment variables
+
+```groovy
+environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') 
+    }
+```
+Hier worden uw dockerhub-credentials opgeslagen in de variable 'DOCKERHUB_CREDENTIALS'.
+
+
 
 
 # B
@@ -42,7 +59,7 @@ Dit doen we door de volgende commando in te voeren in de remote server waardat w
 usermod is de commando om permissions toe te wijzen aan een gebruiker (ubuntu) op de gegeven commando (docker)
 `-aG` zijn de permissies die we meegeven hiervoor.
 
-## Stages
+## Pipeline
 ### Environment variables
 
 ```groovy
@@ -52,7 +69,8 @@ environment {
 }
 ```
 Hier stellen wij de IP en User in van de remote server waarop we de deployment willen maken. Een environment variabel is noodzakelijk om manuele verandering te voorkomen op meerdere lijnen.
-### Cleanup
+### Stages
+#### Cleanup
 ```groovy
 stage('cleanup') {
   steps {
