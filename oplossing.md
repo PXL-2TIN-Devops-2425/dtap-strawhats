@@ -23,9 +23,8 @@ Dit doen we door de volgende commando in te voeren in de remote server waardat w
 usermod is de commando om permissions toe te wijzen aan een gebruiker (ubuntu) op de gegeven commando (docker)
 `-aG` zijn de permissies die we meegeven hiervoor.
 
-## Stages
+## Pipeline
 ### Environment variables
-
 ```groovy
 environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') 
@@ -33,7 +32,90 @@ environment {
 ```
 Hier worden uw dockerhub-credentials opgeslagen in de variable 'DOCKERHUB_CREDENTIALS'.
 
+### Stages
+#### CleanUp
+```groovy
+stage ('cleanup'){
+        steps{
+            cleanWs()
+            sh 'docker remove -f calc-app-container'
+        }
+    }
+```
+Met cleanWs() maken we onze Workspace schoon en met het command 
+```groovy 
+docker remove -f calc-app-container
+```
+stoppen en verwijderen we de docker container met de naam calc-app-container die in deze pipeline gemaakt wordt.
 
+#### Fetch app code
+```groovy
+stage('fetch app code') {
+    steps {
+        // Get some code from a GitHub repository
+        git branch: 'main', url: 'https://github.com/SarbjitSinghPXL/calculator-app-finished.git'
+    }
+}
+```
+In de eerste stage (fetch app code) gaan we de afgewerkte calculator-app code clonen.
+
+#### Install dependencies
+```groovy
+stage('Install dependencies'){
+    tools {
+        nodejs 'testenvnode'
+    }
+    steps {
+        sh 'npm install'
+    }
+}
+```
+Hier worden de nodige dependencies geïnstalleren.
+
+#### Build artifact
+```groovy
+stage('Build artifact'){
+    steps{
+        script {
+            docker.build("safri1/calc-app-image")
+        }
+    }
+} 
+```
+In deze stage wordt de docker image, genaamd calc-app-image, gebuild.
+
+#### Push artifact
+```groovy
+stage('Push artifact'){
+    steps{
+        script {
+            docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                docker.image("safri1/calc-app-image:latest").push()
+            }
+        }
+    }
+}
+```
+
+
+#### Deployment
+```groovy
+stage('deployment'){
+    steps{
+        sh 'docker run -d -p 3000:3000 --name=calc-app-container safri1/calc-app-image:latest'
+    }
+}
+```
+
+### CleanUp
+```groovy
+post {
+    always {
+        sh 'docker logout'
+        cleanWs()
+    }
+}
+```
 
 
 # B
@@ -90,7 +172,7 @@ stage('cleanup') {
       }
       cleanWs()
   }
-  }
+}
 ```
 `sshagent(credentials: ['ssh-prod'])` 
 Hier zeggen we welke ssh key we gebruiken voor de ssh agent.
@@ -113,7 +195,7 @@ Als er geen running container is, gooit deze een error.
 Het zelfde geld voor de if statement daaronder, maar hier kijken we dan voor bestaande images.
 `cleanWs()` is een Jenkins functie die de workspace cleaned. Het is in principe niet nodig, maar toch doen we het voor future cleanups, stel het zou nodig zijn.
 
-### Deploy prod
+#### Deploy prod
 ```groovy
 stage('deploy prod') {
     steps {
@@ -133,7 +215,7 @@ We gaan hier van uit dat de image publiek available is.
 Dit betekent dus dat we niet hoeven in te loggen.
 Stel de image zou private zijn, dan zouden we hier ook credentials voor moeten meegeven zoals in de `test.jenkinsfile` en inloggen op docker via de cli.
 
-### Start prod
+#### Start prod
 ```groovy
 stage('start prod') {
     steps {
@@ -151,7 +233,7 @@ We gaan de container detached runnen zodat het niet stopt nadat image succesvol 
 We portforwarden 3000 naar 80 zodat we via port 80 aan de applicatie kunnen via de browser (http).
 We geven ook een naam voor duidelijkheid.
 
-### Test prod
+#### Test prod
 ```groovy
 stage('test prod') {
   steps {
