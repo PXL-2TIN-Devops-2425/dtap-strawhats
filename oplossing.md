@@ -14,7 +14,7 @@ Deze Docker plugins zijn nodig om het de pipeline te kunnen runnen.
 
 ![Tools NodeJS installaties](image-1.png)
 
-Verder moeten we ook nog een NodeJS installatie toeveogen dit is belnagrijk om de pipleine te kunnen runnen je moet voor al kijken naar de naam van de installatie en de versie
+Verder moeten we ook nog een NodeJS installatie toeveogen dit is belnagrijk om de pipleine te kunnen runnen je moet voor al kijken naar de naam van de installatie en de versie.
 
 ### Credentials
 
