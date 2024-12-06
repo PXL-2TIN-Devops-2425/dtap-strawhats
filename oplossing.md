@@ -8,13 +8,19 @@ opmaak met Markdown.
 
 ![Plugins Docker](image.png)
 
+Deze Docker plugins zijn nodig om het de pipeline te kunnen runnen.
+
 ### Jenkins Tools
 
 ![Tools NodeJS installaties](image-1.png)
 
+Verder moeten we ook nog een NodeJS installatie toeveogen dit is belnagrijk om de pipleine te kunnen runnen je moet voor al kijken naar de naam van de installatie en de versie
+
 ### Credentials
 
 ![Docker Credentials](image-2.png)
+
+Deze credentials heb je nodig om te runnen vooral belangrijk is de naam van de crendiatals.
 
 ### Permissions
 We moeten er zeker van zijn dat we docker kunnen gebruiken via de pipeline zonder sudo.
