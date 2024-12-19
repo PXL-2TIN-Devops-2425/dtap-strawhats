@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        PROD_SERVER_IP = '52.207.214.242'
+        PROD_SERVER_IP = '44.210.123.225'
         PROD_SERVER_USER = 'ubuntu'
     }
     
