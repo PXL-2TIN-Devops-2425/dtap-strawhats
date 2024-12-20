@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         
-        PROD_SERVER_IP = '34.203.190.68'
+        PROD_SERVER_IP = '44.204.11.102'
         PROD_SERVER_USER = 'ubuntu'
     }
     
