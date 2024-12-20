@@ -4,14 +4,50 @@ pipeline {
     stages {
         stage ('cleanup'){
             steps{
-                // TODO
+                cleanWs()
+                sh 'docker remove -f calc-app-container'
             }
         }
         stage('fetch app code') {
             steps {
                 // Get some code from a GitHub repository
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+                git branch: 'main', url: 'https://github.com/SarbjitSinghPXL/calculator-app-finished.git'
             }
+        }
+        stage('Install dependencies'){
+            tools {
+                nodejs 'testenvnode'
+            }
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Build artifact'){
+            steps{
+                script {
+                    docker.build("safri1/calc-app-image")
+                }
+            }
+        } 
+        stage('Push artifact'){
+            steps{
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        docker.image("safri1/calc-app-image:latest").push()
+                    }
+                }
+            }
+        }
+        stage('deployment'){
+            steps{
+                sh 'docker run -d -p 3000:3000 --name=calc-app-container safri1/calc-app-image:latest'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout'
+            cleanWs()
         }
     }
 }

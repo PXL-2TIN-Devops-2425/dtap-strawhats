@@ -1,10 +1,84 @@
 pipeline {
     agent any
+    
+    environment {
+        
+        PROD_SERVER_IP = '44.204.11.102'
+        PROD_SERVER_USER = 'ubuntu'
+    }
+    
     stages {
-        stage('dtap production') {
+        stage('cleanup') {
             steps {
-                echo "good luck..."
+                sshagent(credentials: ['ssh-prod']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no $PROD_SERVER_USER@$PROD_SERVER_IP '
+                        if [ "$(docker ps -a -q)" ]; then
+                            docker stop $(docker ps -a -q)
+                            docker rm $(docker ps -a -q)
+                        fi
+
+                        if [ "$(docker images -aq)" ]; then
+                            docker rmi -f $(docker images -aq)
+                        fi
+                        '
+                    '''
+                }
+                cleanWs()
             }
         }
+        stage('deploy prod') {
+            steps {
+                sshagent(credentials: ['ssh-prod']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no $PROD_SERVER_USER@$PROD_SERVER_IP '
+                        docker pull safri1/calc-app-image
+                        '
+                    '''
+                }
+            }
+        }
+        stage('start prod') {
+            steps {
+                sshagent(credentials: ['ssh-prod']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no $PROD_SERVER_USER@$PROD_SERVER_IP '
+                        docker container run -d -p 80:3000 --name=PXLcalc-app-container safri1/calc-app-image
+                        '
+                    '''
+                }
+            }
+        }
+        stage('test prod') {
+            steps {
+                script {
+                    sleep(10) // wachten totdat we zeker zijn dat het is gedeployed.
+                    
+                    retry(3) { // retry mechanism
+                        def response = sh(
+                            script: "curl -f -s -o /dev/null -w '%{http_code}' http://$PROD_SERVER_IP",
+                            returnStatus: true
+                        )
+                        
+                        if (response != 0) {
+                            error "Curl failed with exit code ${response}"
+                        }
+                        
+                        // Additional check to ensure 200 OK
+                        def httpCode = sh(
+                            script: "curl -s -o /dev/null -w '%{http_code}' http://$PROD_SERVER_IP",
+                            returnStdout: true
+                        ).trim()
+                        
+                        echo "HTTP status code: ${httpCode}"
+                        
+                        if (httpCode != '200') {
+                            error "HTTP status code is not 200. Got ${httpCode}"
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
